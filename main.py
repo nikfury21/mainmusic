@@ -825,11 +825,14 @@ async def fallback_local_playback(chat_id: int, message: Message, song_info: dic
 
         # Download & play locally
         media_path = await vector_transport_resolver(video_url)
+        song_info["file_path"] = media_path   # ✅ store local path for later cleanup
+
         await call_py.play(
             chat_id,
             MediaStream(media_path, video_flags=MediaStream.Flags.IGNORE)
         )
         song_info["start_time"] = time.time()
+
 
         playback_tasks[chat_id] = asyncio.current_task()
 
@@ -1505,11 +1508,12 @@ if __name__ == "__main__":
     logger.info(f"✅ Bot Link: {BOT_LINK}")
 
 
-
+async def init_assistant():
     if not assistant.is_connected:
         logger.info("Assistant not connected; starting assistant client...")
-        assistant.run()
+        await assistant.start()
         logger.info("Assistant client connected.")
+
 
     try:
         assistant_user = assistant.get_me()
