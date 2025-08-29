@@ -138,9 +138,8 @@ async def vector_transport_resolver(url: str) -> str:
     try:
         proc = psutil.Process(os.getpid())
         proc.nice(psutil.IDLE_PRIORITY_CLASS if os.name == "nt" else 19)
-        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.mp3')
-        file_name = temp_file.name
-        temp_file.close()
+        import uuid
+        file_name = f"/tmp/{uuid.uuid4().hex}.mp3"
 
         download_url = f"{DOWNLOAD_API_URL}{url}"
 
