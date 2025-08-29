@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: frozen-music-bot
+    env: python
+    region: oregon   # or your closest Render region
+    plan: free
+    buildCommand: |
+      apt-get update && apt-get install -y ffmpeg
+      pip install -r requirements.txt
+    startCommand: python3 main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10
