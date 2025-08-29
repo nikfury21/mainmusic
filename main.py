@@ -486,7 +486,9 @@ async def play_handler(_, message: Message):
 
         await processing_message.edit("⏳ Please wait, downloading audio…")
         try:
-            file_path = await bot.download_media(media)
+            import uuid
+            file_path = await bot.download_media(media, file_name=f"/tmp/{uuid.uuid4()}")
+
         except Exception as e:
             await processing_message.edit(f"❌ Failed to download media: {e}")
             return
@@ -859,12 +861,27 @@ async def fallback_local_playback(chat_id: int, message: Message, song_info: dic
 
         # Use raw thumbnail if available
         thumb_url = song_info.get("thumbnail")
-        progress_message = await message.reply_photo(
-            photo=thumb_url,
-            caption=base_caption,
-            reply_markup=base_keyboard,
-            parse_mode=ParseMode.HTML
-        )
+        try:
+            if thumb_url:
+                progress_message = await message.reply_photo(
+                    photo=thumb_url,
+                    caption=base_caption,
+                    reply_markup=base_keyboard,
+                    parse_mode=ParseMode.HTML
+                )
+            else:
+                progress_message = await message.reply(
+                    text=base_caption,
+                    reply_markup=base_keyboard,
+                    parse_mode=ParseMode.HTML
+                )
+        except Exception:
+            progress_message = await message.reply(
+                text=base_caption,
+                reply_markup=base_keyboard,
+                parse_mode=ParseMode.HTML
+            )
+
 
         # Remove "processing" message
         await message.delete()
